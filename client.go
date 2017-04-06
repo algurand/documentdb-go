@@ -1,12 +1,12 @@
 package documentdb
 
 import (
-	"encoding/json"
-	"strings"
-	"net/http"
 	"bytes"
-	"io"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"strings"
 )
 
 type Clienter interface {
@@ -19,8 +19,8 @@ type Clienter interface {
 }
 
 type Client struct {
-	Url	string
-	Config	Config
+	Url    string
+	Config Config
 	http.Client
 }
 
@@ -41,7 +41,7 @@ func (c *Client) Query(link, query string, ret interface{}) error {
 	if err != nil {
 		return err
 	}
-	r := ResourceRequest(link, req)
+	r := ResourceRequest(link, req, c.Config)
 	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
 		return err
 	}
@@ -86,7 +86,7 @@ func (c *Client) method(method, link string, status int, ret interface{}, body *
 	if err != nil {
 		return err
 	}
-	r := ResourceRequest(link, req)
+	r := ResourceRequest(link, req, c.Config)
 	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func (c *Client) do(r *Request, status int, data interface{}) error {
 		return err
 	}
 	defer resp.Body.Close()
-	if data == nil  {
+	if data == nil {
 		return nil
 	}
 	return readJson(resp.Body, data)
@@ -131,9 +131,12 @@ func querify(query string) string {
 // Stringify body data
 func stringify(body interface{}) (bt []byte, err error) {
 	switch t := body.(type) {
-	case string: bt = []byte(t)
-	case []byte: bt = t
-	default: bt, err = json.Marshal(t)
+	case string:
+		bt = []byte(t)
+	case []byte:
+		bt = t
+	default:
+		bt, err = json.Marshal(t)
 	}
 	return
 }

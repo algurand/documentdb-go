@@ -2,8 +2,9 @@
 > Go driver for Microsoft Azure DocumentDB 
 
 ### Note
-This is a **WIP** project.  
-I'm doing it on my spare time and hope to stabilize it soon. if you want to contribute, feel free to take some task [here](https://github.com/a8m/documentdb-go/issues/3)
+forked from a8m/documentdb-go
+
+Added documentdb versions support
 
 ## Table of contents:
 - [Get Started](#get-started)
@@ -47,16 +48,16 @@ I'm doing it on my spare time and hope to stabilize it soon. if you want to cont
 ### Get Started
 #### Installation
 ```sh
-$ go get github.com/a8m/documentdb-go
+$ go get github.com/algurand/documentdb-go
 ```
 #### Add to your project
 ```go
 import (
-	"github.com/a8m/documentdb"
+	documentdb "github.com/algurand/documentdb-db"
 )
 
 func main() {
-	client := documentdb.New("connection-url", documentdb.Config{"master-key"})
+	client := documentdb.New("connection-url", documentdb.Config{MasterKey: "master-key", Version: "2016-07-11"})
 	// Start using DocumentDB
 	dbs, err := client.ReadDatabases()
 	if err != nill {

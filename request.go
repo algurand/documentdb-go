@@ -2,19 +2,19 @@ package documentdb
 
 import (
 	"fmt"
-	"strings"
-	"time"
 	"net/http"
 	"net/url"
+	"strings"
+	"time"
 )
 
 const (
-	HEADER_XDATE	= "X-Ms-Date"
-	HEADER_AUTH 	= "Authorization"
-	HEADER_VER	= "X-Ms-Version"
-	HEADER_CONTYPE	= "Content-Type"
-	HEADER_CONLEN	= "Content-Length"
-	HEADER_IS_QUERY	= "X-Ms-Documentdb-Isquery"
+	HEADER_XDATE    = "X-Ms-Date"
+	HEADER_AUTH     = "Authorization"
+	HEADER_VER      = "X-Ms-Version"
+	HEADER_CONTYPE  = "Content-Type"
+	HEADER_CONLEN   = "Content-Length"
+	HEADER_IS_QUERY = "X-Ms-Documentdb-Isquery"
 )
 
 // Request Error
@@ -30,21 +30,26 @@ func (e RequestError) Error() string {
 
 // Resource Request
 type Request struct {
-	rId, rType	string
+	rId, rType string
+	cfg        Config
 	*http.Request
 }
 
 // Return new resource request with type and id
-func ResourceRequest(link string, req *http.Request) *Request {
+func ResourceRequest(link string, req *http.Request, cfg Config) *Request {
 	rId, rType := parse(link)
-	return &Request{rId, rType, req}
+	return &Request{rId, rType, cfg, req}
 }
 
 // Add 3 default headers to *Request
 // "x-ms-date", "x-ms-version", "authorization"
 func (req *Request) DefaultHeaders(mKey string) (err error) {
 	req.Header.Add(HEADER_XDATE, time.Now().UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT"))
-	req.Header.Add(HEADER_VER, "2014-08-21")
+	if req.cfg.Version != "" {
+		req.Header.Add(HEADER_VER, req.cfg.Version)
+	} else {
+		req.Header.Add(HEADER_VER, "2014-08-21")
+	}
 
 	// Auth
 	parts := []string{req.Method, req.rType, req.rId, req.Header.Get(HEADER_XDATE), req.Header.Get("Date"), ""}
@@ -55,7 +60,7 @@ func (req *Request) DefaultHeaders(mKey string) (err error) {
 
 	masterToken := "master"
 	tokenVersion := "1.0"
-	req.Header.Add(HEADER_AUTH, url.QueryEscape("type=" + masterToken + "&ver=" + tokenVersion + "&sig=" +sign))
+	req.Header.Add(HEADER_AUTH, url.QueryEscape("type="+masterToken+"&ver="+tokenVersion+"&sig="+sign))
 	return
 }
 
@@ -79,14 +84,12 @@ func parse(id string) (rId, rType string) {
 	parts := strings.Split(id, "/")
 	l := len(parts)
 
-	if l % 2 == 0 {
-		rId = parts[l - 2]
-		rType = parts[l - 3]
+	if l%2 == 0 {
+		rId = parts[l-2]
+		rType = parts[l-3]
 	} else {
-		rId = parts[l - 3]
-		rType = parts[l - 2]
+		rId = parts[l-3]
+		rType = parts[l-2]
 	}
 	return
 }
-
-
