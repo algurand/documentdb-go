@@ -95,6 +95,7 @@ func (c *Client) method(method, link string, status int, ret interface{}, body *
 
 // Private Do function, DRY
 func (c *Client) do(r *Request, status int, data interface{}) error {
+	r.Header["x-ms-max-item-count"] = []string{"1000"}
 	resp, err := c.Do(r.Request)
 	if err != nil {
 		return err
