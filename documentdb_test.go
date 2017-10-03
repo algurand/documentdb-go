@@ -2,8 +2,9 @@ package documentdb
 
 import (
 	"testing"
-	"github.com/stretchr/testify/mock"
+
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type ClientStub struct {
@@ -42,7 +43,7 @@ func (c *ClientStub) Execute(link string, body, ret interface{}) error {
 
 func TestNew(t *testing.T) {
 	assert := assert.New(t)
-	client := New("url", Config{"config"})
+	client := New("url", Config{"config", "2016-07-11"})
 	assert.IsType(client, &DocumentDB{}, "Should return DocumentDB object")
 }
 
@@ -107,36 +108,36 @@ func TestReadCollections(t *testing.T) {
 	client := &ClientStub{}
 	c := &DocumentDB{client}
 	dbLink := "dblink/"
-	client.On("Read", dbLink + "colls/").Return(nil)
+	client.On("Read", dbLink+"colls/").Return(nil)
 	c.ReadCollections(dbLink)
-	client.AssertCalled(t, "Read", dbLink + "colls/")
+	client.AssertCalled(t, "Read", dbLink+"colls/")
 }
 
 func TestReadStoredProcedures(t *testing.T) {
 	client := &ClientStub{}
 	c := &DocumentDB{client}
 	collLink := "colllink/"
-	client.On("Read", collLink + "sprocs/").Return(nil)
+	client.On("Read", collLink+"sprocs/").Return(nil)
 	c.ReadStoredProcedures(collLink)
-	client.AssertCalled(t, "Read", collLink + "sprocs/")
+	client.AssertCalled(t, "Read", collLink+"sprocs/")
 }
 
 func TestReadUserDefinedFunctions(t *testing.T) {
 	client := &ClientStub{}
 	c := &DocumentDB{client}
 	collLink := "colllink/"
-	client.On("Read", collLink + "udfs/").Return(nil)
+	client.On("Read", collLink+"udfs/").Return(nil)
 	c.ReadUserDefinedFunctions(collLink)
-	client.AssertCalled(t, "Read", collLink + "udfs/")
+	client.AssertCalled(t, "Read", collLink+"udfs/")
 }
 
 func TestReadDocuments(t *testing.T) {
 	client := &ClientStub{}
 	c := &DocumentDB{client}
 	collLink := "colllink/"
-	client.On("Read", collLink + "docs/").Return(nil)
-	c.ReadDocuments(collLink, struct {}{})
-	client.AssertCalled(t, "Read", collLink + "docs/")
+	client.On("Read", collLink+"docs/").Return(nil)
+	c.ReadDocuments(collLink, struct{}{})
+	client.AssertCalled(t, "Read", collLink+"docs/")
 }
 
 func TestQueryDatabases(t *testing.T) {
@@ -175,9 +176,9 @@ func TestQueryDocuments(t *testing.T) {
 	client := &ClientStub{}
 	c := &DocumentDB{client}
 	collLink := "coll_self_link/"
-	client.On("Query", collLink + "docs/", "SELECT * FROM ROOT r").Return(nil)
-	c.QueryDocuments(collLink, "SELECT * FROM ROOT r", struct {}{})
-	client.AssertCalled(t, "Query", collLink + "docs/", "SELECT * FROM ROOT r")
+	client.On("Query", collLink+"docs/", "SELECT * FROM ROOT r").Return(nil)
+	c.QueryDocuments(collLink, "SELECT * FROM ROOT r", struct{}{})
+	client.AssertCalled(t, "Query", collLink+"docs/", "SELECT * FROM ROOT r")
 }
 
 func TestCreateDatabase(t *testing.T) {

@@ -4,19 +4,20 @@ import (
 	"bytes"
 	"net/http"
 	"testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
 func TestResourceRequest(t *testing.T) {
 	assert := assert.New(t)
-	req := ResourceRequest("/dbs/b5NCAA==/", &http.Request{})
+	req := ResourceRequest("/dbs/b5NCAA==/", &http.Request{}, Config{"config", "2016-07-11"})
 	assert.Equal(req.rType, "dbs")
 	assert.Equal(req.rId, "b5NCAA==")
 }
 
 func TestDefaultHeaders(t *testing.T) {
 	r, _ := http.NewRequest("GET", "link", &bytes.Buffer{})
-	req := ResourceRequest("/dbs/b5NCAA==/", r)
+	req := ResourceRequest("/dbs/b5NCAA==/", r, Config{"config", "2016-07-11"})
 	_ = req.DefaultHeaders("YXJpZWwNCg==")
 
 	assert := assert.New(t)

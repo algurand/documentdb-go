@@ -7,7 +7,11 @@
 //
 package documentdb
 
-import "reflect"
+import (
+	"net/http"
+	"reflect"
+	"time"
+)
 
 type Config struct {
 	MasterKey string
@@ -20,9 +24,15 @@ type DocumentDB struct {
 
 // Create DocumentDBClient
 func New(url string, config Config) *DocumentDB {
-	client := &Client{}
-	client.Url = url
-	client.Config = config
+	client := &Client{
+		url,
+		config,
+		http.Client{
+			Transport: &http.Transport{
+				TLSHandshakeTimeout: 20 * time.Second,
+			},
+		},
+	}
 	return &DocumentDB{client}
 }
 
