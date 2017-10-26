@@ -19,8 +19,9 @@ const (
 
 // Request Error
 type RequestError struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
+	Code    string      `json:"code"`
+	Message string      `json:"message"`
+	Header  http.Header `json:"header"`
 }
 
 // Implement Error function

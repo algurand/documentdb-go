@@ -101,8 +101,13 @@ func (c *Client) do(r *Request, status int, data interface{}) error {
 		return err
 	}
 	if resp.StatusCode != status {
-		err = &RequestError{}
-		readJson(resp.Body, &err)
+		err1 := RequestError{}
+		readJson(resp.Body, &err1)
+		err = &RequestError{
+			Code:    err1.Code,
+			Message: err1.Message,
+			Header:  resp.Header,
+		}
 		return err
 	}
 	defer resp.Body.Close()
