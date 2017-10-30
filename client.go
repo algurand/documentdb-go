@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"io"
 	"net/http"
 	"strings"
@@ -82,14 +83,18 @@ func (c *Client) Execute(link string, body, ret interface{}) error {
 
 // Private generic method resource
 func (c *Client) method(method, link string, status int, ret interface{}, body *bytes.Buffer) (err error) {
+	log.Println("1")
 	req, err := http.NewRequest(method, path(c.Url, link), body)
+	log.Println("2")
 	if err != nil {
 		return err
 	}
 	r := ResourceRequest(link, req, c.Config)
+	log.Println("3")
 	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
 		return err
 	}
+	log.Println("4")
 	return c.do(r, status, ret)
 }
 
@@ -97,12 +102,17 @@ func (c *Client) method(method, link string, status int, ret interface{}, body *
 func (c *Client) do(r *Request, status int, data interface{}) error {
 	r.Header["x-ms-max-item-count"] = []string{"1000"}
 	resp, err := c.Do(r.Request)
+	log.Println("5")
 	if err != nil {
 		return err
 	}
 	if resp.StatusCode != status {
 		err1 := RequestError{}
-		readJson(resp.Body, &err1)
+		log.Println("7", resp.StatusCode)
+		if err = readJson(resp.Body, &err1); err != nil{
+			log.Println("error")
+			log.Println(err)
+		}
 		err = &RequestError{
 			Code:    err1.Code,
 			Message: err1.Message,
@@ -114,6 +124,7 @@ func (c *Client) do(r *Request, status int, data interface{}) error {
 	if data == nil {
 		return nil
 	}
+	log.Println("6")
 	return readJson(resp.Body, data)
 }
 
