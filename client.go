@@ -106,6 +106,7 @@ func (c *Client) do(r *Request, status int, data interface{}) error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != status {
 		err1 := RequestError{}
 		log.Println("7", resp.StatusCode)
@@ -120,7 +121,7 @@ func (c *Client) do(r *Request, status int, data interface{}) error {
 		}
 		return err
 	}
-	defer resp.Body.Close()
+	
 	if data == nil {
 		return nil
 	}
